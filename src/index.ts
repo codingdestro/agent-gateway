@@ -3,6 +3,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import { createMcpServer } from "./server";
 import { log } from "./logger";
+import { apiKeyAuth } from "./utils/auth";
 
 const port = Number(process.env.PORT ?? 3000);
 
@@ -13,7 +14,7 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 
 const app = createMcpExpressApp();
 
-app.post("/mcp", async (req: Request, res: Response) => {
+app.post("/mcp", apiKeyAuth, async (req: Request, res: Response) => {
   const startedAt = performance.now();
   const body = req.body as { method?: string; id?: unknown } | undefined;
   const server = createMcpServer();
@@ -90,8 +91,7 @@ function methodNotAllowed(method: string) {
   };
 }
 
-app.get("/mcp", methodNotAllowed("GET"));
-app.delete("/mcp", methodNotAllowed("DELETE"));
+app.all("/mcp", methodNotAllowed("GET"));
 
 function errorField(
   error: unknown,
