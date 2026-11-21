@@ -14,6 +14,15 @@ export function loadConfig(): schema {
   };
 }
 
-function loadEnv(name: string, def: string): string {
-  return process.env[name] ?? def;
+function loadEnv(key: string, def: string): string {
+  return process.env[key] ?? def;
+}
+
+function mustEnv(key: string): string {
+  const value = process.env[key];
+  if (!value || value === "") {
+    console.error(key, "must be provided!");
+    process.exit(1);
+  }
+  return value;
 }
