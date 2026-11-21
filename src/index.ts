@@ -4,6 +4,7 @@ import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js
 import { createMcpServer } from "./server";
 import { log } from "./logger";
 import { apiKeyAuth } from "./utils/auth";
+import routes from "./routes";
 
 const port = Number(process.env.PORT ?? 3000);
 
@@ -149,6 +150,8 @@ app.use((error: unknown, req: Request, res: Response, _next: NextFunction) => {
     id: null,
   });
 });
+
+app.use("/api", routes);
 
 const httpServer = app.listen(port, "127.0.0.1", () => {
   log("info", "server.listening", { url: `http://127.0.0.1:${port}/mcp` });
