@@ -1,13 +1,15 @@
 import type { NextFunction, Request, Response } from "express";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
+
 import { createMcpServer } from "./server";
 import { log } from "./logger";
 import { apiKeyAuth } from "./utils/auth";
-// import routes from "./routes";
+import { loadConfig } from "./config";
 
-const port = Number(process.env.PORT ?? 3000);
+const cnf = loadConfig();
 
+const port = Number(cnf.port);
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
   log("error", "config.invalid_port", { PORT: process.env.PORT });
   process.exit(1);
@@ -151,8 +153,8 @@ app.use((error: unknown, req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-const httpServer = app.listen(port, "127.0.0.1", () => {
-  log("info", "server.listening", { url: `http://127.0.0.1:${port}/mcp` });
+const httpServer = app.listen(port, cnf.host, () => {
+  log("info", "server.listening", { url: `http://${cnf.host}:${port}/mcp` });
 });
 
 httpServer.on("error", (error) => {
