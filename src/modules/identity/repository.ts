@@ -1,17 +1,15 @@
+import type Database from "../../database/db";
 import type { User } from "./validation";
 
-// Replace this with your actual DB client (Prisma, Drizzle, Knex, etc.)
 export class AuthRepository {
+  constructor(private db: Database) {}
   async findByEmail(email: string): Promise<User | null> {
-    // Example with Prisma:
-    // return prisma.user.findUnique({ where: { email } });
-
-    // Placeholder
+    this.db.query("SELECT * FROM users where email = ? ", [email]);
     return null;
   }
 
   async findById(id: string | number): Promise<User | null> {
-    // return prisma.user.findUnique({ where: { id } });
+    this.db.query("SELECT * FROM users where id = ? ", [id]);
     return null;
   }
 
@@ -20,7 +18,11 @@ export class AuthRepository {
     password: string;
     name?: string;
   }): Promise<User> {
-    // return prisma.user.create({ data });
+    this.db.query("INSERT (name,email,password) INTO users (?,?,?) ", [
+      data.name,
+      data.email,
+      data.password,
+    ]);
     throw new Error("Not implemented");
   }
 }
