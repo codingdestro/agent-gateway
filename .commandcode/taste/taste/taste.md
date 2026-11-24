@@ -1,5 +1,6 @@
 # Taste
 - Prefers feature modules organized as separate files with a clear layered split: `validation.ts` (schemas/types), `repository.ts` (data access), `service.ts` (business logic), and `controller.ts` (HTTP handlers) as classes. Confidence: 0.7
+- Wants route registration extracted out of the entrypoint into a dedicated `src/routes/` folder, composed via factory functions that take dependencies (e.g. `createRouter(deps)`, `createMcpRouter(apiService)`), leaving `index.ts` as thin wiring (build repos/services/controllers, `app.use(router)`, error handler, listen). Inline route handlers in `index.ts` are treated as improper structure. Confidence: 0.5
 - New database tables are added via timestamped migration files (node-pg-migrate style) with `up`/`down` exports. Confidence: 0.6
 - Wants cross-cutting request concerns handled in Express middleware in `src/middlewares/` that attach data to the request (e.g. `req.userId`, `req.scopes`, `req.apiKeyId`), with controllers just consuming it rather than resolving the session/key themselves; this covers both session-cookie auth and API-key verification with scope-based route guards. Confidence: 0.65
 - Augments Express request types globally via a `src/types/*.d.ts` `declare global` block instead of inline casts. Confidence: 0.55
