@@ -1,0 +1,7 @@
+# Taste
+- Prefers feature modules organized as separate files with a clear layered split: `validation.ts` (schemas/types), `repository.ts` (data access), `service.ts` (business logic), and `controller.ts` (HTTP handlers) as classes. Confidence: 0.7
+- New database tables are added via timestamped migration files (node-pg-migrate style) with `up`/`down` exports. Confidence: 0.6
+- Wants cross-cutting request concerns handled in Express middleware in `src/middlewares/` that attach data to the request (e.g. `req.userId`, `req.scopes`, `req.apiKeyId`), with controllers just consuming it rather than resolving the session/key themselves; this covers both session-cookie auth and API-key verification with scope-based route guards. Confidence: 0.65
+- Augments Express request types globally via a `src/types/*.d.ts` `declare global` block instead of inline casts. Confidence: 0.55
+- Expects HTTP endpoints to be verified end-to-end by actually exercising them (e.g. `curl`) against the running dev server, not just typechecking. Confidence: 0.5
+- Expects temporary verification scaffolding to be cleaned up afterward: throwaway test routes removed, test rows deleted, and any background test server stopped so the working tree/port are left clean. Confidence: 0.4

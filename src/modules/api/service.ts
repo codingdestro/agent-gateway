@@ -1,4 +1,4 @@
-import { createApiKey } from "../../utils/apikey";
+import { createApiKey, isValidAPIKey } from "../../utils/apikey";
 import type { APIRepository } from "./repository";
 import type {
   APIKey,
@@ -42,5 +42,17 @@ export class APIService {
   async revoke(id: string): Promise<SafeAPIKey | null> {
     const revoked = await this.repo.revoke(id);
     return revoked ? toSafeKey(revoked) : null;
+  }
+
+  async verify(plainKey: string): Promise<SafeAPIKey | null> {
+    const candidates = await this.repo.findActive();
+
+    for (const candidate of candidates) {
+      if (await isValidAPIKey(plainKey, candidate.hashed_key)) {
+        return toSafeKey(candidate);
+      }
+    }
+
+    return null;
   }
 }

@@ -28,6 +28,15 @@ export class APIRepository {
     return result.rows;
   }
 
+  async findActive(): Promise<APIKey[]> {
+    const result = await this.db.query<APIKey>(
+      `SELECT * FROM apikeys
+       WHERE revoked = false
+         AND (expires_at IS NULL OR expires_at > now())`,
+    );
+    return result.rows;
+  }
+
   async create(data: APIKeyInsert): Promise<APIKey> {
     const result = await this.db.query<APIKey>(
       `INSERT INTO apikeys (user_id, title, hashed_key, scopes, expires_at)
