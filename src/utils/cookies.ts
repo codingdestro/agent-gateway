@@ -18,5 +18,15 @@ export function clearSessionCookie(res: Response) {
 }
 
 export function getSessionIdFromRequest(req: Request): string | null {
-  return req.cookies?.[COOKIE_NAME] ?? null;
+  const header = req.headers.cookie;
+  if (!header) return null;
+
+  for (const part of header.split(";")) {
+    const [name, ...value] = part.trim().split("=");
+    if (name === COOKIE_NAME) {
+      return decodeURIComponent(value.join("=")) || null;
+    }
+  }
+
+  return null;
 }

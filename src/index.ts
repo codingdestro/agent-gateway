@@ -10,6 +10,10 @@ import Database from "./database/db";
 import { AuthRepository } from "./modules/identity/repository";
 import { UserService } from "./modules/identity/service";
 import { UserController } from "./modules/identity/controller";
+import { APIRepository } from "./modules/api/repository";
+import { APIService } from "./modules/api/service";
+import { APIController } from "./modules/api/controller";
+import { requireUserId } from "./middlewares/auth";
 
 const cnf = loadConfig();
 
@@ -21,10 +25,16 @@ const userRepo = new AuthRepository(db);
 const userService = new UserService(userRepo);
 const userController = new UserController(userService);
 
+const apiRepo = new APIRepository(db);
+const apiService = new APIService(apiRepo);
+const apiController = new APIController(apiService);
+
 const app = createMcpExpressApp();
 
 app.post("/api/user/login", userController.login);
 app.post("/api/user/register", userController.register);
+app.post("/api/key/create", requireUserId, apiController.create);
+app.post("/api/key/list", requireUserId, apiController.list);
 
 app.post("/mcp", apiKeyAuth, async (req: Request, res: Response) => {
   const startedAt = performance.now();
