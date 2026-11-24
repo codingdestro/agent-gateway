@@ -6,16 +6,25 @@ import { createMcpServer } from "./server";
 import { log } from "./logger";
 import { apiKeyAuth } from "./utils/auth";
 import { loadConfig } from "./config";
+import Database from "./database/db";
+import { AuthRepository } from "./modules/identity/repository";
+import { UserService } from "./modules/identity/service";
+import { UserController } from "./modules/identity/controller";
 
 const cnf = loadConfig();
 
-const port = Number(cnf.port);
-if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  log("error", "config.invalid_port", { PORT: process.env.PORT });
-  process.exit(1);
-}
+const port = cnf.port;
+
+const db = Database.getInstance(cnf.databaseUrl);
+
+const userRepo = new AuthRepository(db);
+const userService = new UserService(userRepo);
+const userController = new UserController(userService);
 
 const app = createMcpExpressApp();
+
+app.post("/api/user/login", userController.login);
+app.post("/api/user/register", userController.register);
 
 app.post("/mcp", apiKeyAuth, async (req: Request, res: Response) => {
   const startedAt = performance.now();
@@ -153,7 +162,7 @@ app.use((error: unknown, req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
-const httpServer = app.listen(port, cnf.host, () => {
+const httpServer = app.listen(port as number, cnf.host, () => {
   log("info", "server.listening", { url: `http://${cnf.host}:${port}/mcp` });
 });
 

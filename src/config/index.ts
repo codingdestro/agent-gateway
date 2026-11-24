@@ -3,14 +3,22 @@ import dotenv from "dotenv";
 dotenv.config();
 
 interface schema {
-  port: string;
+  port: string | number;
   host: string;
+  databaseUrl: string;
 }
 
 export function loadConfig(): schema {
   return {
-    port: loadEnv("PORT", "3000"),
+    port: (() => {
+      const port = Number(loadEnv("PORT", "3000"));
+      if (!Number.isInteger(port) || port < 1 || port > 65535) {
+        process.exit(1);
+      }
+      return port;
+    })(),
     host: loadEnv("HOST", "127.0.0.1"),
+    databaseUrl: mustEnv("DATABASE_URL"),
   };
 }
 
