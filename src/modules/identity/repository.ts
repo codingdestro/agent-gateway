@@ -3,26 +3,34 @@ import type { User } from "./validation";
 
 export class AuthRepository {
   constructor(private db: Database) {}
+
   async findByEmail(email: string): Promise<User | null> {
-    this.db.query("SELECT * FROM users where email = ? ", [email]);
-    return null;
+    const result = await this.db.query<User>(
+      "SELECT * FROM users WHERE email = $1",
+      [email],
+    );
+    return result.rows[0] ?? null;
   }
 
   async findById(id: string | number): Promise<User | null> {
-    this.db.query("SELECT * FROM users where id = ? ", [id]);
-    return null;
+    const result = await this.db.query<User>(
+      "SELECT * FROM users WHERE id = $1",
+      [id],
+    );
+    return result.rows[0] ?? null;
   }
 
   async createUser(data: {
     email: string;
     password: string;
-    name?: string;
+    username: string;
   }): Promise<User> {
-    this.db.query("INSERT (name,email,password) INTO users (?,?,?) ", [
-      data.name,
-      data.email,
-      data.password,
-    ]);
-    throw new Error("Not implemented");
+    const result = await this.db.query<User>(
+      `INSERT INTO users (username, email, password)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [data.username, data.email, data.password],
+    );
+    return result.rows[0]!;
   }
 }

@@ -7,7 +7,6 @@ export const UserSchema = z.object({
   email: z.string().email(),
   created_at: z.coerce.date(),
   scopes: z.array(z.string()).default([]),
-  // optional extras
   updated_at: z.coerce.date().optional(),
   is_active: z.boolean().default(true),
 });
